@@ -1,5 +1,28 @@
 # Neatlys
 
+This repository contains the Neatlys service platform scaffold (Next.js frontend + API routes).
+
+Local setup (basic):
+
+1. Copy `.env.example` to `.env.local` and fill values.
+2. Install dependencies:
+
+```bash
+cd Neatlys
+npm install
+```
+
+3. Run dev server:
+
+```bash
+npm run dev
+```
+
+Database:
+- Apply `src/config/schema.sql` to your Neon/Postgres instance before running.
+
+API routes are under `src/pages/api/`.
+
 ## Project Overview
 Neatlys is a project that aims to simplify the management of personal and professional tasks through an organized interface that allows users to manage their schedules efficiently.
 
