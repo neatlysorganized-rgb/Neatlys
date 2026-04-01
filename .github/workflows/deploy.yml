@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Pages
+name: Deploy to Cloudflare Workers
 
 on:
   push:
@@ -13,9 +13,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
       - name: Install
         run: npm ci
-        working-directory: ./
       - name: Build
         run: npm run build
       - name: Validate required GitHub secrets
@@ -31,10 +31,20 @@ jobs:
             echo "Missing required GitHub secret: CLOUDFLARE_ACCOUNT_ID"
             exit 1
           fi
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare Worker (OpenNext)
+        run: npm run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Verify Cloudflare authentication context
+        run: npx wrangler whoami
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Deploy static marketing site to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: neatlys
-          directory: .
+          directory: .open-next/assets

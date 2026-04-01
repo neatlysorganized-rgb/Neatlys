@@ -1,0 +1,8 @@
+.local-secrets/
+node_modules/
+.next/
+.open-next/
+.wrangler/
+.DS_Store
+.env
+.env.local
