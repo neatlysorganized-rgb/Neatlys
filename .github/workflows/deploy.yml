@@ -62,7 +62,7 @@ jobs:
             --data "{\"name\":\"${PAGES_PROJECT}\",\"production_branch\":\"main\"}")
 
           echo "$CREATE_JSON"
-          echo "$CREATE_JSON" | grep -q '"success":true'
+          echo "$CREATE_JSON" | grep -Eq '"success"[[:space:]]*:[[:space:]]*true'
       - name: Deploy static marketing site to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
