@@ -46,23 +46,23 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT != '' && vars.CLOUDFLARE_PAGES_PROJECT || 'neatlys-site' }}
         run: |
-          LIST_JSON=$(curl -sS "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects" \
-            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-            -H "Content-Type: application/json")
-
-          if echo "$LIST_JSON" | grep -q "\"name\":\"${PAGES_PROJECT}\""; then
-            echo "Pages project already exists: ${PAGES_PROJECT}"
-            exit 0
-          fi
-
-          echo "Creating Pages project: ${PAGES_PROJECT}"
+          echo "Ensuring Pages project exists: ${PAGES_PROJECT}"
           CREATE_JSON=$(curl -sS -X POST "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects" \
             -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
             -H "Content-Type: application/json" \
             --data "{\"name\":\"${PAGES_PROJECT}\",\"production_branch\":\"main\"}")
 
           echo "$CREATE_JSON"
-          echo "$CREATE_JSON" | grep -Eq '"success"[[:space:]]*:[[:space:]]*true'
+          if echo "$CREATE_JSON" | grep -Eq '"success"[[:space:]]*:[[:space:]]*true'; then
+            exit 0
+          fi
+
+          if echo "$CREATE_JSON" | grep -q '"code":[[:space:]]*8000002'; then
+            echo "Pages project already exists: ${PAGES_PROJECT}"
+            exit 0
+          fi
+
+          exit 1
       - name: Deploy static marketing site to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
