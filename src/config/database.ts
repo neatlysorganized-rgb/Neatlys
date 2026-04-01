@@ -1,14 +1,22 @@
 import { Pool, QueryResult } from 'pg';
 
-const connectionString = process.env.DATABASE_URL;
+let pool: Pool | null = null;
 
-if (!connectionString) {
-  throw new Error('DATABASE_URL is not set');
+function getPool(): Pool {
+  if (pool) {
+    return pool;
+  }
+
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error('DATABASE_URL is not set');
+  }
+
+  pool = new Pool({ connectionString });
+  return pool;
 }
 
-export const pool = new Pool({ connectionString });
-
 export async function query<RowType = unknown>(text: string, params: unknown[] = []): Promise<QueryResult<RowType>> {
-  const res = await pool.query<RowType>(text, params);
+  const res = await getPool().query<RowType>(text, params);
   return res;
 }
