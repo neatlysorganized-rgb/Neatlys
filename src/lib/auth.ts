@@ -22,7 +22,7 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
   return bcrypt.compare(password, hash);
 }
 
-export function signToken(payload: AuthTokenPayload, expiresIn = '7d'): string {
+export function signToken(payload: AuthTokenPayload, expiresIn: jwt.SignOptions['expiresIn'] = '7d'): string {
   return jwt.sign(payload, JWT_SECRET, { expiresIn, algorithm: 'HS256' });
 }
 
